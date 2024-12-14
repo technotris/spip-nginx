@@ -12,3 +12,7 @@ PHP 7.4. MySQL 8+ possible
 
 ### For SPIP 4.x
 PHP 8+ and MySQL 8+
+
+## Instruction
+
+SPIP source have to go into src/ folder
