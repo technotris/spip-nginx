@@ -1,0 +1,47 @@
+services:
+    database:
+        # for PHP < 7.4
+        image: library/mysql:5.7
+        restart: always
+        ports:
+            - 3306:3306
+        environment:
+            MYSQL_ROOT_PASSWORD: password
+            MYSQL_USER: test
+            MYSQL_PASSWORD: technique
+            MYSQL_DATABASE: spip
+        volumes:
+            - ./appdata/db:/var/lib/mysql
+    webserver:
+        image: nginx:1.26.2
+        volumes:
+            - ./docker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+            - ./docker/nginx/certs/:/etc/nginx/ssl/
+            - ./src/:/var/www/html/
+        ports:
+            - "80:80"
+            - "443:443"
+        environment:
+            SERVER_NAME: ${SERVER_NAME:-localhost}, php:80
+            TRUSTED_PROXIES: ${TRUSTED_PROXIES:-127.0.0.0/8,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16}
+            TRUSTED_HOSTS: ^${SERVER_NAME:-example\.com|localhost}|php$$
+            DATABASE_URL: mysql://test:technique@database:3306/spip
+#to change for production
+            MAILER_DSN: smtp://mailer:1025
+    php:
+        build:
+            context: ./docker/php/spip4.3
+            target: spip_php_dev
+        restart: unless-stopped
+        volumes:
+            - ./src:/var/www/html/
+#to remove for production
+    mailer:
+        image: axllent/mailpit
+        hostname: localhost
+        ports:
+            - "1025:1025"
+            - "8025:8025"
+        environment:
+            MP_SMTP_AUTH_ACCEPT_ANY: 1
+            MP_SMTP_AUTH_ALLOW_INSECURE: 1
