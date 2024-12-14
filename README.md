@@ -16,3 +16,4 @@ PHP 8+ and MySQL 8+
 ## Instruction
 
 SPIP source have to go into src/ folder
+appdata/ folder have to be created to host the database volume
